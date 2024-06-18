@@ -18,13 +18,17 @@ public class GUI extends JFrame implements ActionListener {
 	//Player Data
 	int gold;
 	int exp;
+	int nxtExp;
 	int dmg;
 	int arm;
-	int[] playerData = new int[4];
+	int lvl;
+	int nxtLvl;
+	int[] playerData = new int[5];
 	
 	//Universal Components
 	Font titleFont = new Font("Yu Gothic UI", Font.PLAIN, 20);
-	Font ButtonFont = new Font("Yu Gothic UI", Font.PLAIN, 15);
+	Font buttonFont = new Font("Yu Gothic UI", Font.PLAIN, 15);
+	Font subTitleFont = new Font("Yu Gothic UI", Font.PLAIN, 13);
 	SaveFile saveFile = new SaveFile(playerData);
 	JButton exit;
 	
@@ -41,6 +45,7 @@ public class GUI extends JFrame implements ActionListener {
 	//Inventory Menu Components
 	JPanel inventoryPanel, backpackPanel;
 	JScrollPane backpackPane;
+	JLabel goldLabel, lvlLabel, expLabel, dmgLabel, armLabel;
 	
 	
 	public GUI() {
@@ -54,8 +59,11 @@ public class GUI extends JFrame implements ActionListener {
 		//Player Data
 		gold = saveFile.load()[0];
 		exp = saveFile.load()[1];
+		nxtExp = 100 * lvl;
 		dmg = saveFile.load()[2];
 		arm = saveFile.load()[3];
+		lvl = saveFile.load()[4];
+		nxtLvl = lvl + 1;
 		
 		//Main Menu
 		this.setSize(400, 300);
@@ -78,25 +86,25 @@ public class GUI extends JFrame implements ActionListener {
 		this.mainPanel.add(mainText2);
 		
 		this.shopButton = new JButton("Shop");
-		this.shopButton.setFont(ButtonFont);
+		this.shopButton.setFont(buttonFont);
 		this.shopButton.setBounds(72, 100, 125, 75);
 		this.shopButton.addActionListener(this);
 		this.mainPanel.add(shopButton);
 		
 		this.battleButton = new JButton("Catacombs");
-		this.battleButton.setFont(ButtonFont);
+		this.battleButton.setFont(buttonFont);
 		this.battleButton.setBounds(202, 100, 125, 75);
 		this.battleButton.addActionListener(this);
 		this.mainPanel.add(battleButton);
 		
 		this.inventoryButton = new JButton("Inventory");
-		this.inventoryButton.setFont(ButtonFont);
+		this.inventoryButton.setFont(buttonFont);
 		this.inventoryButton.setBounds(72, 181, 125, 75);
 		this.inventoryButton.addActionListener(this);
 		this.mainPanel.add(inventoryButton);
 		
 		this.saveButton = new JButton("Save");
-		this.saveButton.setFont(ButtonFont);
+		this.saveButton.setFont(buttonFont);
 		this.saveButton.setBounds(202, 181, 125, 75);
 		this.saveButton.addActionListener(this);
 		this.mainPanel.add(saveButton);
@@ -105,6 +113,11 @@ public class GUI extends JFrame implements ActionListener {
 		this.shopPanel = new JPanel();
 		this.shopPanel.setSize(800, 500);
 		this.shopPanel.setLayout(null);
+		
+		this.exit = new JButton("Leave");
+		this.exit.setBounds(2, 419, 100, 50);
+		this.exit.setFont(buttonFont);
+		this.exit.addActionListener(this);
 		
 		this.shopText1 = new JLabel("Welcome to the Catacombs, Adventurer");
 		this.shopText1.setHorizontalAlignment(JLabel.CENTER);
@@ -123,8 +136,6 @@ public class GUI extends JFrame implements ActionListener {
 		this.goldText.setBounds(225, 390, 350, 30);
 		this.goldText.setFont(titleFont);
 		this.shopPanel.add(goldText);
-		
-		this.exit = new JButton("Leave shop");
 		
 		this.armourPanel = new JPanel();
 		this.armourPanel.setSize(154, 1000);
@@ -167,15 +178,49 @@ public class GUI extends JFrame implements ActionListener {
 		this.shopPanel.add(materialPane, BorderLayout.CENTER);
 		
 		//Inventory Menu
+		this.inventoryPanel = new JPanel();
+		this.inventoryPanel.setSize(800, 500);
+		this.inventoryPanel.setLayout(null);	
 		
+		this.goldLabel = new JLabel("Gold: " + gold);
+		this.goldLabel.setHorizontalAlignment(JLabel.LEFT);
+		this.goldLabel.setBounds(5, 0, 100, 30);
+		this.goldLabel.setFont(subTitleFont);
+		this.inventoryPanel.add(goldLabel);
+		
+		this.lvlLabel = new JLabel("Level: " + lvl);
+		this.lvlLabel.setHorizontalAlignment(JLabel.LEFT);
+		this.lvlLabel.setBounds(5, 20, 300, 30);
+		this.lvlLabel.setFont(subTitleFont);
+		this.inventoryPanel.add(lvlLabel);
+		
+		this.expLabel = new JLabel("Exp: " + exp + "/" + nxtExp + " to level " + nxtLvl);
+		this.expLabel.setHorizontalAlignment(JLabel.LEFT);
+		this.expLabel.setBounds(5, 40, 300, 30);
+		this.expLabel.setFont(subTitleFont);
+		this.inventoryPanel.add(expLabel);
+		
+		this.dmgLabel = new JLabel("Damage: " + dmg);
+		this.dmgLabel.setHorizontalAlignment(JLabel.LEFT);
+		this.dmgLabel.setBounds(5, 60, 300, 30);
+		this.dmgLabel.setFont(subTitleFont);
+		this.inventoryPanel.add(dmgLabel);
+		
+		this.armLabel = new JLabel("Armour: " + arm);
+		this.armLabel.setHorizontalAlignment(JLabel.LEFT);
+		this.armLabel.setBounds(5, 80, 300, 30);
+		this.armLabel.setFont(subTitleFont);
+		this.inventoryPanel.add(armLabel);
+			
 		//Startup
 		mainMenu();
 	}
 	
 	public void mainMenu() {
-		
+
 		this.add(mainPanel);
 		this.setSize(400, 300);
+		this.setLocationRelativeTo(null);
 		this.mainPanel.setVisible(true);
 		this.setVisible(true);
 	}
@@ -184,6 +229,19 @@ public class GUI extends JFrame implements ActionListener {
 		
 		if(e.getSource() == exit) {
 			
+			if(shopPanel.isVisible() == true) {
+				
+				this.shopPanel.setVisible(false);
+				this.remove(shopPanel);
+				this.shopPanel.remove(exit);
+			}
+			
+			if(inventoryPanel.isVisible() == true) {
+				
+				this.inventoryPanel.setVisible(false);
+				this.remove(inventoryPanel);
+				this.inventoryPanel.remove(exit);
+			}
 			mainMenu();
 		}
 		
@@ -194,6 +252,7 @@ public class GUI extends JFrame implements ActionListener {
 			this.setLocationRelativeTo(null);
 			this.remove(mainPanel);
 			this.add(shopPanel);
+			this.shopPanel.add(exit);
 			this.shopPanel.setVisible(true);
 		}
 		
@@ -204,7 +263,13 @@ public class GUI extends JFrame implements ActionListener {
 		
 		else if(e.getSource() == inventoryButton) {
 			
-			System.out.println("inventory");
+			this.mainPanel.setVisible(false);
+			this.setSize(800, 500);
+			this.setLocationRelativeTo(null);
+			this.remove(mainPanel);
+			this.add(inventoryPanel);
+			this.inventoryPanel.add(exit);
+			this.inventoryPanel.setVisible(true);
 		}
 		
 		else if(e.getSource() == saveButton) {
@@ -213,6 +278,7 @@ public class GUI extends JFrame implements ActionListener {
 			playerData[1] = exp;
 			playerData[2] = dmg;
 			playerData[3] = arm;
+			playerData[4] = lvl;
 			saveFile.save();
 		}
 	}
@@ -227,7 +293,7 @@ class SaveFile {
 	
 	
 	int[] p;
-	File playerData = new File("C:\\Users\\Potter\\Downloads\\Catacombs-Java-main\\Catacombs-Java-main\\Catacombs mk2\\bin\\playerData.txt");
+	File playerData = new File("C:\\Users\\rpotter5328\\Downloads\\Catacombs mk2\\bin\\playerData.txt");
 	
 	SaveFile(int[] player) {
 		
@@ -255,7 +321,7 @@ class SaveFile {
 	
 	int[] load() {
 		
-		int[] data = new int[4];
+		int[] data = new int[5];
 		
 		try {
 			
