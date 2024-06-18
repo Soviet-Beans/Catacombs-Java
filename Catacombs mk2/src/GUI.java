@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Scanner;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -23,7 +25,16 @@ public class GUI extends JFrame implements ActionListener {
 	int arm;
 	int lvl;
 	int nxtLvl;
-	int[] playerData = new int[5];
+	int equippedWeapon;
+	int equippedWeaponDmg() {
+		
+		if(equippedWeapon == 1) {
+			return 1;
+		}
+		
+		return 0;
+	}
+	int[] playerData = new int[7];
 	
 	//Universal Components
 	Font titleFont = new Font("Yu Gothic UI", Font.PLAIN, 20);
@@ -31,6 +42,11 @@ public class GUI extends JFrame implements ActionListener {
 	Font subTitleFont = new Font("Yu Gothic UI", Font.PLAIN, 13);
 	SaveFile saveFile = new SaveFile(playerData);
 	JButton exit;
+	
+	//Items
+	//Weapons
+	Weapon club = new Weapon(1, 1);
+	Boolean clubOwned = false;
 	
 	//Main Menu Components
 	JPanel mainPanel;
@@ -41,6 +57,7 @@ public class GUI extends JFrame implements ActionListener {
 	JPanel shopPanel, armourPanel, weaponPanel, itemPanel, materialPanel;
 	JScrollPane armourPane, weaponPane, itemPane, materialPane;
 	JLabel shopText1, shopText2, goldText;
+	JButton buyClub;
 	
 	//Inventory Menu Components
 	JPanel inventoryPanel, backpackPanel;
@@ -59,10 +76,12 @@ public class GUI extends JFrame implements ActionListener {
 		//Player Data
 		gold = saveFile.load()[0];
 		exp = saveFile.load()[1];
-		nxtExp = 100 * lvl;
+		nxtExp = 100;
 		dmg = saveFile.load()[2];
 		arm = saveFile.load()[3];
 		lvl = saveFile.load()[4];
+		if(saveFile.load()[6] == 1) clubOwned = true;
+			
 		nxtLvl = lvl + 1;
 		
 		//Main Menu
@@ -142,6 +161,12 @@ public class GUI extends JFrame implements ActionListener {
 		
 		this.weaponPanel = new JPanel();
 		this.weaponPanel.setSize(154, 1000);
+		
+		this.buyClub = new JButton("Club dmg: 1");
+		this.buyClub.setPreferredSize(new Dimension(140, 40));
+		this.buyClub.setFont(buttonFont);
+		this.buyClub.addActionListener(this);
+		this.weaponPanel.add(buyClub);
 		
 		this.itemPanel = new JPanel();
 		this.itemPanel.setSize(154, 1000);
@@ -279,6 +304,8 @@ public class GUI extends JFrame implements ActionListener {
 			playerData[2] = dmg;
 			playerData[3] = arm;
 			playerData[4] = lvl;
+			playerData[5] = equippedWeapon;
+			if(clubOwned = true) playerData[6] = 1;
 			saveFile.save();
 		}
 	}
@@ -293,7 +320,7 @@ class SaveFile {
 	
 	
 	int[] p;
-	File playerData = new File("C:\\Users\\rpotter5328\\Downloads\\Catacombs mk2\\bin\\playerData.txt");
+	File playerData = new File("C:\\Users\\Potter\\Downloads\\Catacombs-Java-main\\Catacombs-Java-main\\Catacombs mk2\\bin\\playerData.txt");
 	
 	SaveFile(int[] player) {
 		
@@ -321,20 +348,39 @@ class SaveFile {
 	
 	int[] load() {
 		
-		int[] data = new int[5];
+		int[] data = new int[7];
+		int i = 0;
 		
 		try {
 			
 			FileReader fr = new FileReader(playerData.getAbsoluteFile());
-			BufferedReader r = new BufferedReader(fr);
+			Scanner r = new Scanner(fr);
 			
-			for(int i = 0; i <= p.length - i; i++) {
+			while (r.hasNextLine()) {
 				
-				String line = r.readLine();
+				String line = r.nextLine();
 				data[i] = Integer.parseInt(line);
+				i++;
 			}
 		} catch(Exception e){}
 		
 		return data;
+	}
+}
+
+//Item Classes
+class Weapon {
+	
+	int[] stats = new int[2];
+	
+	Weapon(int damage, int id) {
+		
+		stats[0] = damage;
+		stats[1] = id;
+	}
+	
+	int[] getStats() {
+		
+		return stats;
 	}
 }
