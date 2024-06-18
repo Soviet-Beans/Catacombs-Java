@@ -1,25 +1,32 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
-import javax.swing.JScrollBar;
 
 public class GUI extends JFrame implements ActionListener {
+	
+	//Player Data
+	int gold;
+	int exp;
+	int dmg;
+	int arm;
+	int[] playerData = new int[4];
 	
 	//Universal Components
 	Font titleFont = new Font("Yu Gothic UI", Font.PLAIN, 20);
 	Font ButtonFont = new Font("Yu Gothic UI", Font.PLAIN, 15);
-	int[] playerData;
 	SaveFile saveFile = new SaveFile(playerData);
+	JButton exit;
 	
 	//Main Menu Components
 	JPanel mainPanel;
@@ -27,10 +34,14 @@ public class GUI extends JFrame implements ActionListener {
 	JButton shopButton, battleButton, inventoryButton, saveButton;
 	
 	//Shop Menu Components
-	JLabel shopText1, shopText2;
-	JButton exit;
 	JPanel shopPanel, armourPanel, weaponPanel, itemPanel, materialPanel;
 	JScrollPane armourPane, weaponPane, itemPane, materialPane;
+	JLabel shopText1, shopText2, goldText;
+	
+	//Inventory Menu Components
+	JPanel inventoryPanel, backpackPanel;
+	JScrollPane backpackPane;
+	
 	
 	public GUI() {
 		
@@ -39,6 +50,12 @@ public class GUI extends JFrame implements ActionListener {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setLayout(null);
+		
+		//Player Data
+		gold = saveFile.load()[0];
+		exp = saveFile.load()[1];
+		dmg = saveFile.load()[2];
+		arm = saveFile.load()[3];
 		
 		//Main Menu
 		this.setSize(400, 300);
@@ -91,7 +108,7 @@ public class GUI extends JFrame implements ActionListener {
 		
 		this.shopText1 = new JLabel("Welcome to the Catacombs, Adventurer");
 		this.shopText1.setHorizontalAlignment(JLabel.CENTER);
-		this.shopText1.setBounds(225, 10, 350, 30);
+		this.shopText1.setBounds(215, 10, 370, 30);
 		this.shopText1.setFont(titleFont);
 		this.shopPanel.add(shopText1);
 		
@@ -100,6 +117,12 @@ public class GUI extends JFrame implements ActionListener {
 		this.shopText2.setBounds(225, 45, 350, 30);
 		this.shopText2.setFont(titleFont);
 		this.shopPanel.add(shopText2);
+		
+		this.goldText = new JLabel("Gold: " + gold);
+		this.goldText.setHorizontalAlignment(JLabel.CENTER);
+		this.goldText.setBounds(225, 390, 350, 30);
+		this.goldText.setFont(titleFont);
+		this.shopPanel.add(goldText);
 		
 		this.exit = new JButton("Leave shop");
 		
@@ -143,7 +166,14 @@ public class GUI extends JFrame implements ActionListener {
 		this.materialPane.setViewportView(materialPanel);
 		this.shopPanel.add(materialPane, BorderLayout.CENTER);
 		
+		//Inventory Menu
+		
 		//Startup
+		mainMenu();
+	}
+	
+	public void mainMenu() {
+		
 		this.add(mainPanel);
 		this.setSize(400, 300);
 		this.mainPanel.setVisible(true);
@@ -152,7 +182,12 @@ public class GUI extends JFrame implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		
-		if(e.getSource() == shopButton) {
+		if(e.getSource() == exit) {
+			
+			mainMenu();
+		}
+		
+		else if(e.getSource() == shopButton) {
 			
 			this.mainPanel.setVisible(false);
 			this.setSize(800, 500);
@@ -174,7 +209,11 @@ public class GUI extends JFrame implements ActionListener {
 		
 		else if(e.getSource() == saveButton) {
 			
-			System.out.println("save");
+			playerData[0] = gold;
+			playerData[1] = exp;
+			playerData[2] = dmg;
+			playerData[3] = arm;
+			saveFile.save();
 		}
 	}
 	
@@ -186,8 +225,9 @@ public class GUI extends JFrame implements ActionListener {
 
 class SaveFile {
 	
+	
 	int[] p;
-	File playerData = new File("src/playerData.txt");
+	File playerData = new File("C:\\Users\\Potter\\Downloads\\Catacombs-Java-main\\Catacombs-Java-main\\Catacombs mk2\\bin\\playerData.txt");
 	
 	SaveFile(int[] player) {
 		
@@ -196,10 +236,39 @@ class SaveFile {
 	
 	void save() {
 		
-		try(FileWriter w = new FileWriter(playerData)) {
+		String content = "";
+		
+		for(int i = 0; i <= p.length - 1; i++) {
 			
-			String data = p.toString();
-			w.append(data);
-		} catch(Exception e){};
+			content = content + p[i] + "\n";
+		}
+		
+		try{
+			
+            FileWriter fw = new FileWriter(playerData.getAbsoluteFile());
+            BufferedWriter w = new BufferedWriter(fw);
+            
+            w.write(content);
+        	w.close();
+        } catch(Exception e){}
+	}
+	
+	int[] load() {
+		
+		int[] data = new int[4];
+		
+		try {
+			
+			FileReader fr = new FileReader(playerData.getAbsoluteFile());
+			BufferedReader r = new BufferedReader(fr);
+			
+			for(int i = 0; i <= p.length - i; i++) {
+				
+				String line = r.readLine();
+				data[i] = Integer.parseInt(line);
+			}
+		} catch(Exception e){}
+		
+		return data;
 	}
 }
